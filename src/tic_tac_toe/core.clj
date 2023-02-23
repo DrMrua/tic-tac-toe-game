@@ -13,8 +13,8 @@
 
 (defn player-turn [player-x-turn]
   (if (= player-x-turn true)
-    "x"
-    "o"))
+    "X"
+    "O"))
 
 (defn free-field? [input board]
   (cond
@@ -111,24 +111,31 @@
 (defn start
   []
   (println "You have started a new game. Press a number between 1-9")
-  (loop [board initial-board                                ;state of board
-         player-x-turn? false                                ;shows players turn it is.
-         ]
-    (let [print-board (print-board board)
-          input (read-input)]
-      (cond
-        (= input "stop") (str "game has stopped")               ;End the game if user writes stop.
-        (winner? board (player-turn player-x-turn?)) (do
-                                                       print-board
-                                                       (str "You have won the game!"))
-        (tie? board)    (do
-                          print-board
-                          (str "The game is a tie"))
-        (and (valid-number? input) (valid-field? input board)) (recur
-                                                                 (move input board player-x-turn?) ;state of board
-                                                                 (take-turn (not player-x-turn?))) ;each player take turns
-        :else
-        (recur
-          board
-          (take-turn player-x-turn?)                        ;take turn.
-          )))))
+  (do
+    ;(read-input)
+    (loop [board initial-board                                ;state of board
+           player-x-turn? false                                ;shows players turn it is.
+           print-b (print-board board)
+           ]
+      (let [
+            ;print-board (print-board board)
+            input (read-input)
+            ]
+        (cond
+          (= input "stop") (str "game has stopped")               ;End the game if user writes stop.
+          (winner? board (player-turn player-x-turn?)) (do
+                                                         (print-board board)
+                                                         (str "You have won the game!"))
+          (tie? board)    (do
+                            (print-board board)
+                            (str "The game is a tie"))
+          (and (valid-number? input) (valid-field? input board)) (recur
+                                                                   (move input board player-x-turn?) ;state of board
+                                                                   (take-turn (not player-x-turn?))
+                                                                   (print-board board)) ;each player take turns
+          :else
+          (recur
+            board
+            (take-turn player-x-turn?)                        ;take turn.
+            (print-board board)
+            ))))))
