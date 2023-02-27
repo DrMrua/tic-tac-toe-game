@@ -49,9 +49,7 @@
                  (concat column diagonal)
                  vec
                  (some (fn [row] (every? (fn [e] (= e player)) row))))]
-    (do
-      (println "res="fun "player=" player board )
-      fun)))
+    fun))
 
 (defn tie?
   [board]
@@ -75,7 +73,7 @@
     full-board?
     ))
 
-(defn move [input board player-x-turn?]
+(defn update-board [input board player-x-turn?]
   (cond
     (contains? #{1 2 3} input) (assoc board 0 (assoc (get-in board [0]) (rem (dec input) 3) (player-turn player-x-turn?)))
     (contains? #{4 5 6} input) (assoc board 1 (assoc (get-in board [1]) (rem (dec input) 3) (player-turn player-x-turn?)))
@@ -87,7 +85,7 @@
   (if (contains? (set (range 1 10)) number)
     true
     (do
-      (println "!!!!!!!!!!! Invalid input! You most provide a number between 1-9. Try again.!!!!!!!!!!!")
+      (println "Invalid move! You most provide a number between 1-9. Try again.")
       false)))
 
 (defn read-input []
@@ -97,18 +95,42 @@
         "stop"
         (Integer/parseInt input))
       (catch NumberFormatException e
-        (println "!!!!!!!!!!!Input most be an number!!!!!!!!!!!")))))
+        (println "Invalid move! Input most be an number. Try again.")))))
 
 (defn take-turn [player-x-turn?]
   (if (= player-x-turn? true)
     (do
-      (println "It is players x's turn")    ;move player x
+      (println "It is players " (player-turn player-x-turn?) "'s turn")    ;move player x
       true)
     (do
-      (println "It is players o's turn") ;else mover player o
+      (println "It is players " (player-turn player-x-turn?) "'s turn") ;else mover player o
       false)))
 
-(defn start
+(defn move
+  [board player-x?]
+  (loop [board board
+         player-x? player-x?]
+    (let [input (read-input)]
+      (cond
+        (= input "stop") (str "Game has stopped")
+        (and (valid-number? input) (valid-field? input board)) (update-board input board player-x?)
+        :else
+        (recur board player-x?)))))
+
+(defn start-game []
+  (println "You have started a new game. Press a number between 1-9")
+  (loop [board initial-board
+         player-x-turn? true]
+    (let [print-the-board (print-board board)]
+      (cond
+        (winner? board (player-turn player-x-turn?)) (str "Congratulations you have won the game!")
+        (tie? board) (str "It is a tie!")
+        :else
+        (recur
+          (move board (take-turn player-x-turn?))
+          (not player-x-turn?))))))
+
+#_(defn start
   []
   (println "You have started a new game. Press a number between 1-9")
   (do
