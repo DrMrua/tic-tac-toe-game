@@ -110,8 +110,12 @@
          player-x-turn? true]
     (let [print-the-board (print-board board)]
       (cond
-        (winner? board (player-turn (not player-x-turn?))) (str "Congratulations you have won the game!")
-        (tie? board) (str "It is a tie!")
+        (winner? board (player-turn (not player-x-turn?))) (do
+                                                             (println "Congratulations you have won the game!")
+                                                             (str "Congratulations you have won the game!"))
+        (tie? board) (do
+                      (println "It is a tie!")
+                      (str "It is a tie!"))
         :else
         (recur
           (move board (take-turn player-x-turn?))
